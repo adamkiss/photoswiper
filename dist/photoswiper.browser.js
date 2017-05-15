@@ -3,9 +3,9 @@
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-/*! PhotoSwipe Default UI - 4.1.1 - 2015-12-24
+/*! PhotoSwipe Default UI - 4.1.2 - 2017-04-05
 * http://photoswipe.com
-* Copyright (c) 2015 Dmitry Semenov; */
+* Copyright (c) 2017 Dmitry Semenov; */
 /**
 *
 * UI on top of main sliding area (caption, arrows, close button, etc.).
@@ -794,9 +794,9 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 });
 
 },{}],2:[function(_dereq_,module,exports){
-/*! PhotoSwipe - v4.1.1 - 2015-12-24
+/*! PhotoSwipe - v4.1.2 - 2017-04-05
 * http://photoswipe.com
-* Copyright (c) 2015 Dmitry Semenov; */
+* Copyright (c) 2017 Dmitry Semenov; */
 (function (root, factory) { 
 	if (typeof define === 'function' && define.amd) {
 		define(factory);
@@ -1193,6 +1193,8 @@ var _isOpen,
 	_features,
 	_windowVisibleSize = {},
 	_renderMaxResolution = false,
+	_orientationChangeTimeout,
+
 
 	// Registers PhotoSWipe module (History, Controller ...)
 	_registerModule = function(name, module) {
@@ -1340,13 +1342,13 @@ var _isOpen,
 			framework.bind(document, 'mousemove', _onFirstMouseMove);
 		}
 
-		framework.bind(window, 'resize scroll', self);
+		framework.bind(window, 'resize scroll orientationchange', self);
 
 		_shout('bindEvents');
 	},
 
 	_unbindEvents = function() {
-		framework.unbind(window, 'resize', self);
+		framework.unbind(window, 'resize scroll orientationchange', self);
 		framework.unbind(window, 'scroll', _globalEventHandlers.scroll);
 		framework.unbind(document, 'keydown', self);
 		framework.unbind(document, 'mousemove', _onFirstMouseMove);
@@ -1358,6 +1360,8 @@ var _isOpen,
 		if(_isDragging) {
 			framework.unbind(window, _upMoveEvents, self);
 		}
+
+		clearTimeout(_orientationChangeTimeout);
 
 		_shout('unbindEvents');
 	},
@@ -1637,6 +1641,18 @@ var publicMethods = {
 		// Setup global events
 		_globalEventHandlers = {
 			resize: self.updateSize,
+
+			// Fixes: iOS 10.3 resize event
+			// does not update scrollWrap.clientWidth instantly after resize
+			// https://github.com/dimsemenov/PhotoSwipe/issues/1315
+			orientationchange: function() {
+				clearTimeout(_orientationChangeTimeout);
+				_orientationChangeTimeout = setTimeout(function() {
+					if(_viewportSize.x !== self.scrollWrap.clientWidth) {
+						self.updateSize();
+					}
+				}, 500);
+			},
 			scroll: _updatePageScrollOffset,
 			keydown: _onKeyDown,
 			click: _onGlobalClick
@@ -5199,7 +5215,7 @@ var Photoswiper = function () {
             var _this3 = this;
 
             var thumbSelector = this.structure.THUMB;
-            return Object.assign({}, this.pswpOptions, {
+            return Object.assign({}, {
                 galleryUID: galleryEl.getAttribute('data-pswp-uid'),
                 getThumbBoundsFn: function getThumbBoundsFn(index) {
                     var thumb = _this3.items[index].el.querySelector(thumbSelector);
@@ -5212,7 +5228,7 @@ var Photoswiper = function () {
                         w: rect.width
                     };
                 }
-            });
+            }, this.pswpOptions);
         }
     }, {
         key: '_urlIndex',
@@ -5350,15 +5366,13 @@ var Photoswiper = function () {
 /* JQUERY INTERFACE INITIALIZATION */
 
 if (window.jQuery !== undefined) {
-    (function () {
-        var JQUERY_NO_CONFLICT = jQuery.fn[NAME];
-        jQuery.fn[NAME] = Photoswiper._jQueryInterface;
-        jQuery.fn[NAME].Constructor = Photoswiper;
-        jQuery.fn[NAME].noConflict = function () {
-            jQuery.fn[NAME] = JQUERY_NO_CONFLICT;
-            return Photoswiper._jQueryInterface;
-        };
-    })();
+    var JQUERY_NO_CONFLICT = jQuery.fn[NAME];
+    jQuery.fn[NAME] = Photoswiper._jQueryInterface;
+    jQuery.fn[NAME].Constructor = Photoswiper;
+    jQuery.fn[NAME].noConflict = function () {
+        jQuery.fn[NAME] = JQUERY_NO_CONFLICT;
+        return Photoswiper._jQueryInterface;
+    };
 }
 
 exports.default = Photoswiper;

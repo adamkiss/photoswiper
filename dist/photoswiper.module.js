@@ -411,7 +411,7 @@ var Photoswiper = function () {
             var _this3 = this;
 
             var thumbSelector = this.structure.THUMB;
-            return Object.assign({}, this.pswpOptions, {
+            return Object.assign({}, {
                 galleryUID: galleryEl.getAttribute('data-pswp-uid'),
                 getThumbBoundsFn: function getThumbBoundsFn(index) {
                     var thumb = _this3.items[index].el.querySelector(thumbSelector);
@@ -424,7 +424,7 @@ var Photoswiper = function () {
                         w: rect.width
                     };
                 }
-            });
+            }, this.pswpOptions);
         }
     }, {
         key: '_urlIndex',
@@ -562,15 +562,13 @@ var Photoswiper = function () {
 /* JQUERY INTERFACE INITIALIZATION */
 
 if (window.jQuery !== undefined) {
-    (function () {
-        var JQUERY_NO_CONFLICT = jQuery.fn[NAME];
-        jQuery.fn[NAME] = Photoswiper._jQueryInterface;
-        jQuery.fn[NAME].Constructor = Photoswiper;
-        jQuery.fn[NAME].noConflict = function () {
-            jQuery.fn[NAME] = JQUERY_NO_CONFLICT;
-            return Photoswiper._jQueryInterface;
-        };
-    })();
+    var JQUERY_NO_CONFLICT = jQuery.fn[NAME];
+    jQuery.fn[NAME] = Photoswiper._jQueryInterface;
+    jQuery.fn[NAME].Constructor = Photoswiper;
+    jQuery.fn[NAME].noConflict = function () {
+        jQuery.fn[NAME] = JQUERY_NO_CONFLICT;
+        return Photoswiper._jQueryInterface;
+    };
 }
 
 exports.default = Photoswiper;
