@@ -321,8 +321,7 @@ class Photoswiper {
 
     _getOptions(galleryEl) {
         let thumbSelector = this.structure.THUMB
-        return Object.assign({},
-            this.pswpOptions, {
+        return Object.assign({}, {
                 galleryUID: galleryEl.getAttribute('data-pswp-uid'),
                 getThumbBoundsFn: (index) => {
                     let thumb = this.items[index].el.querySelector(thumbSelector)
@@ -335,7 +334,7 @@ class Photoswiper {
                         w: rect.width
                     }
                 }
-            }
+            }, this.pswpOptions
         )
     }
 
