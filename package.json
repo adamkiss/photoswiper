@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/sh0ji/photoswiper#readme",
   "dependencies": {
-    "photoswipe": "^4.1.1",
+    "photoswipe": "^4.1.2",
     "tabtrap": "^1.2.6"
   },
   "devDependencies": {
